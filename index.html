@@ -1,1 +1,549 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEVER-KEY-BOT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
+        body {
+            background: #0a0a1a;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Hiệu ứng nền vũ trụ */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background-color: #fff;
+            border-radius: 50%;
+            animation: twinkle 5s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Hiệu ứng sao băng */
+        .shooting-star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: linear-gradient(90deg, #00ffff, transparent);
+            border-radius: 50%;
+            box-shadow: 0 0 10px 2px #00ffff;
+            z-index: -1;
+            opacity: 0;
+        }
+
+        .shooting-star::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100px;
+            height: 1px;
+            background: linear-gradient(90deg, #00ffff, transparent);
+        }
+
+        /* Container chính */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 40px 0 30px;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #6a11cb, #2575fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a0a0ff;
+            margin-bottom: 20px;
+        }
+
+        /* Panel hiển thị key */
+        .key-display-panel {
+            background: rgba(10, 15, 35, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(100, 150, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 150, 255, 0.2);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .key-display-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #6a11cb, #2575fc);
+        }
+
+        .key-label {
+            font-size: 0.9rem;
+            color: #8bb9fe;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .key-value {
+            font-size: 1.8rem;
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 30, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            word-break: break-all;
+            text-align: center;
+            border: 1px solid rgba(100, 150, 255, 0.3);
+            color: #7df9ff;
+            letter-spacing: 1px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Panel điều khiển */
+        .control-panel {
+            background: rgba(15, 20, 40, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(100, 150, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #6a11cb, #2575fc);
+            color: white;
+            box-shadow: 0 5px 15px rgba(37, 117, 252, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(37, 117, 252, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(100, 150, 255, 0.1);
+            color: #8bb9fe;
+            border: 1px solid rgba(100, 150, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(100, 150, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .btn-success {
+            background: linear-gradient(90deg, #00b09b, #96c93d);
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 176, 155, 0.4);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 176, 155, 0.6);
+        }
+
+        /* Thông tin */
+        .info-box {
+            margin-top: 25px;
+            padding: 15px;
+            background: rgba(20, 25, 60, 0.5);
+            border-radius: 10px;
+            border-left: 4px solid #2575fc;
+        }
+
+        .info-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #7df9ff;
+        }
+
+        .info-text {
+            color: #b0b0ff;
+            line-height: 1.5;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #7070aa;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(100, 150, 255, 0.1);
+        }
+
+        /* Animation cho key mới */
+        @keyframes keyGenerated {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .key-generated {
+            animation: keyGenerated 0.5s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .key-value {
+                font-size: 1.4rem;
+                padding: 12px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Hiệu ứng đếm số lần tạo key */
+        .counter {
+            text-align: center;
+            margin-top: 15px;
+            color: #8bb9fe;
+            font-size: 0.9rem;
+        }
+
+        .counter span {
+            color: #7df9ff;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Nền sao -->
+    <div class="stars" id="stars"></div>
+    
+    <!-- Sao băng sẽ được tạo bằng JS -->
+    
+    <div class="container">
+        <header>
+            <h1 class="logo"><i class="fas fa-key"></i> Key Generator</h1>
+            <p class="subtitle">Tạo key ngẫu nhiên không giới hạn - Khám phá vũ trụ key bí ẩn</p>
+        </header>
+        
+        <main>
+            <div class="key-display-panel">
+                <div class="key-label">
+                    <i class="fas fa-code"></i> KEY CỦA BẠN
+                </div>
+                <div class="key-value" id="keyDisplay">
+                    Nhấn nút "Tạo Key" để bắt đầu
+                </div>
+                <div class="counter">
+                    Đã tạo: <span id="counter">0</span> key
+                </div>
+            </div>
+            
+            <div class="control-panel">
+                <div class="button-group">
+                    <button class="btn btn-primary" id="generateBtn">
+                        <i class="fas fa-rocket"></i> Tạo Key Mới
+                    </button>
+                    <button class="btn btn-secondary" id="copyBtn">
+                        <i class="far fa-copy"></i> Sao Chép Key
+                    </button>
+                    <button class="btn btn-success" id="generateMultipleBtn">
+                        <i class="fas fa-bolt"></i> Tạo 5 Key
+                    </button>
+                </div>
+                
+                <div class="info-box">
+                    <div class="info-title">
+                        <i class="fas fa-info-circle"></i> THÔNG TIN
+                    </div>
+                    <div class="info-text">
+                        Mỗi key được tạo ngẫu nhiên và duy nhất. Key có định dạng: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX gồm 25 ký tự chữ và số. Bạn có thể tạo không giới hạn số lượng key.
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>© 2024 Key Generator - Theme Vũ Trụ | Tạo key ngẫu nhiên không giới hạn</p>
+            <p style="margin-top: 5px; font-size: 0.8rem;">Design with <i class="fas fa-heart" style="color: #ff4757;"></i> và hiệu ứng vũ trụ</p>
+        </footer>
+    </div>
+
+    <script>
+        // Tạo nền sao
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starCount = 200;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // Kích thước ngẫu nhiên
+                const size = Math.random() * 3 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                // Vị trí ngẫu nhiên
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                // Độ sáng ngẫu nhiên
+                star.style.opacity = Math.random() * 0.7 + 0.3;
+                
+                // Thời gian animation ngẫu nhiên
+                star.style.animationDuration = `${Math.random() * 5 + 3}s`;
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Tạo hiệu ứng sao băng
+        function createShootingStar() {
+            const shootingStar = document.createElement('div');
+            shootingStar.classList.add('shooting-star');
+            
+            // Vị trí bắt đầu ngẫu nhiên
+            const startX = Math.random() * 100;
+            const startY = Math.random() * 40;
+            
+            shootingStar.style.left = `${startX}%`;
+            shootingStar.style.top = `${startY}%`;
+            
+            // Thời gian và độ dài ngẫu nhiên
+            const duration = Math.random() * 3 + 2;
+            const distance = 100 + Math.random() * 200;
+            
+            shootingStar.style.animation = `shooting ${duration}s linear`;
+            
+            // Thêm style động cho animation
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @keyframes shooting {
+                    0% {
+                        transform: translateX(0) translateY(0);
+                        opacity: 0;
+                    }
+                    10% {
+                        opacity: 1;
+                    }
+                    90% {
+                        opacity: 1;
+                    }
+                    100% {
+                        transform: translateX(${distance}px) translateY(${distance/5}px);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(shootingStar);
+            
+            // Xóa sao băng sau khi animation kết thúc
+            setTimeout(() => {
+                shootingStar.remove();
+                style.remove();
+            }, duration * 1000);
+        }
+
+        // Tạo key ngẫu nhiên
+        function generateKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let key = '';
+            
+            // Tạo key với định dạng: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
+            for (let i = 0; i < 5; i++) {
+                for (let j = 0; j < 5; j++) {
+                    key += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                if (i < 4) key += '-';
+            }
+            
+            return key;
+        }
+
+        // Hiển thị key mới
+        function displayNewKey() {
+            const keyDisplay = document.getElementById('keyDisplay');
+            keyDisplay.textContent = generateKey();
+            keyDisplay.classList.add('key-generated');
+            
+            // Cập nhật bộ đếm
+            updateCounter();
+            
+            // Tạo sao băng khi tạo key mới
+            createShootingStar();
+            
+            // Xóa animation class sau khi hoàn thành
+            setTimeout(() => {
+                keyDisplay.classList.remove('key-generated');
+            }, 500);
+        }
+
+        // Tạo nhiều key
+        function generateMultipleKeys(count) {
+            const keyDisplay = document.getElementById('keyDisplay');
+            let keys = '';
+            
+            for (let i = 0; i < count; i++) {
+                keys += generateKey();
+                if (i < count - 1) keys += '\n';
+            }
+            
+            keyDisplay.textContent = keys;
+            keyDisplay.classList.add('key-generated');
+            
+            // Cập nhật bộ đếm
+            for (let i = 0; i < count; i++) {
+                updateCounter();
+            }
+            
+            // Tạo nhiều sao băng
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => createShootingStar(), i * 300);
+            }
+            
+            // Xóa animation class sau khi hoàn thành
+            setTimeout(() => {
+                keyDisplay.classList.remove('key-generated');
+            }, 500);
+        }
+
+        // Sao chép key vào clipboard
+        function copyKeyToClipboard() {
+            const keyText = document.getElementById('keyDisplay').textContent;
+            
+            navigator.clipboard.writeText(keyText)
+                .then(() => {
+                    // Hiển thị thông báo
+                    const copyBtn = document.getElementById('copyBtn');
+                    const originalHtml = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i> Đã Sao Chép';
+                    copyBtn.classList.add('btn-success');
+                    copyBtn.classList.remove('btn-secondary');
+                    
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalHtml;
+                        copyBtn.classList.remove('btn-success');
+                        copyBtn.classList.add('btn-secondary');
+                    }, 2000);
+                })
+                .catch(err => {
+                    alert('Lỗi sao chép: ' + err);
+                });
+        }
+
+        // Cập nhật bộ đếm
+        let counter = 0;
+        function updateCounter() {
+            counter++;
+            document.getElementById('counter').textContent = counter;
+        }
+
+        // Khởi tạo
+        document.addEventListener('DOMContentLoaded', () => {
+            // Tạo nền sao
+            createStars();
+            
+            // Tạo sao băng định kỳ
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    createShootingStar();
+                }
+            }, 3000);
+            
+            // Tạo key đầu tiên
+            displayNewKey();
+            
+            // Gắn sự kiện cho nút
+            document.getElementById('generateBtn').addEventListener('click', displayNewKey);
+            document.getElementById('copyBtn').addEventListener('click', copyKeyToClipboard);
+            document.getElementById('generateMultipleBtn').addEventListener('click', () => generateMultipleKeys(5));
+            
+            // Tạo sao băng ngẫu nhiên khi di chuột
+            document.addEventListener('mousemove', (e) => {
+                if (Math.random() > 0.995 && e.clientY < 300) {
+                    createShootingStar();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
